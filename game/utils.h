@@ -1,6 +1,6 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-int rand_num_gen();
+extern unsigned short rand_num_gen(unsigned seed);
 
-#endif UTIL_H
+#endif

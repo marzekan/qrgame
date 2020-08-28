@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "utils.h"
 
 #define WND_HEIGHT 500
 #define WND_WIDTH  550
