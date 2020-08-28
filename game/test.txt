@@ -1,5 +1,0 @@
-Bok Domagoj!
-
-Bok i marko!
-
-print ('amo pocet')
