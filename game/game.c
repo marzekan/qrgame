@@ -2,7 +2,7 @@
 #include "utils.h"
 
 #define WND_HEIGHT 500
-#define WND_WIDTH  550
+#define WND_WIDTH  500
 
 const char g_className[] = "myWindowClass";
 
