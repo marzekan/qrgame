@@ -1,14 +1,43 @@
-#include <Windows.h>
+#include "windows.h"
 #include "utils.h"
+
+RECT moveLeft(RECT *rect){
+    rect->left -= 100;
+    rect->right -= 100;
+
+    return *rect;
+}
 
 LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, 
                                 LPARAM lparam)
 {
+    HDC hdc;
+    PAINTSTRUCT ps;
+    RECT rect = {215,400,275,450};
+    
     switch (msg)
     {
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+
+    case WM_PAINT:
+        hdc = BeginPaint(hwnd, &ps);
+        HBRUSH hbrush;
+
+        hbrush = CreateSolidBrush(RGB(255,255,255));
+        FillRect(hdc, &rect, hbrush);
+    
+    case WM_KEYDOWN:
+        if (wparam == VK_LEFT)
+        {
+            rect.left -= 100;
+            rect.right -= 100;
+
+            FillRect(hdc, &rect, hbrush);
+        }
+        break;
+        
     
     default:
         return DefWindowProc (hwnd, msg, wparam, lparam);
@@ -23,7 +52,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance,
 {
     // Init app
     WNDCLASS wc = {0};
-    const char CLASS_NAME[] ="The Game";
+    const char CLASS_NAME[] ="Evade!";
 
     wc.lpszClassName    = CLASS_NAME;
     wc.lpfnWndProc      = WindowProcess;
