@@ -1,8 +1,18 @@
 #include <Windows.h>
 #include "utils.h"
 
+<<<<<<< HEAD
 LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, 
                                 LPARAM lparam)
+=======
+#define WND_HEIGHT 500
+#define WND_WIDTH  500
+
+const char g_className[] = "myWindowClass";
+
+LRESULT CALLBACK WndProc (HWND hwnd, UINT msg,
+    WPARAM wParam, LPARAM lParam)
+>>>>>>> cec2a24cc9074043d3a64ae2d8c592dc30741d0c
 {
     switch (msg)
     {
