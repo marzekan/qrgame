@@ -1,10 +1,8 @@
 #include <Windows.h>
 #include "utils.h"
 
-const char g_className[] = "myWindowClass";
-
-LRESULT CALLBACK WndProc (HWND hwnd, UINT msg,
-    WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, 
+                                LPARAM lparam)
 {
     switch (msg)
     {
