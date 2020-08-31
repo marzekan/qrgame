@@ -1,0 +1,29 @@
+Executable file compressing tutorial (all command lines are executed from Developer Command Prompt).
+
+1) Unzip crinkler23 folder and extract Win32 folder
+2) Open Win32 folder and place name.c file in there
+3) Next, you have to compile that name.c file using command: cl /c name.c
+
+Once you have name.obj file, the fun starts :P. For now you will use the default linker to perform compression
+
+4) Use command: link.exe name.obj /entry:WinMain /defaultlib:user32.lib /defaultlib:kernel32.lib /verbose > out.txt
+   to get executable file and .txt file that will be used for help
+4.5) Make sure that compression was succesful by running the name.exe file
+
+Now we are getting closer to using crinkler for compression. But first open out.txt file
+in your favorite editor and search for texts simmilar to this (the path may be different):
+	Searching C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x86\user32.lib:
+	(key word is Searching)
+	
+ONLY (rember this ONLY, because other paths are not needed) IF there is text underneath it like this one:
+	Found __imp__TranslateMessage@4
+        Referenced in name.obj
+        Loaded user32.lib(USER32.dll)
+	
+you should copy that path. You should repeat this "finding process" until you find all DIFFERENT paths.
+Once you have (in my case 3 of them), in Developer Command Prompt write following command:
+	crinkler.exe name.obj "C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x86\user32.lib" "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC\14.27.29110\lib\x86\LIBCMT.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x86\kernel32.lib" /entry:WinMain
+
+Only difference is that inside quotation marks, you should write your own paths found
+in algorithm above.
+OR you can write the .bat file where you will write this same command.

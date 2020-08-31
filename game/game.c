@@ -1,80 +1,64 @@
-#include <windows.h>
+#include <Windows.h>
 #include "utils.h"
 
-#define WND_HEIGHT 500
-#define WND_WIDTH  550
-
-const char g_className[] = "myWindowClass";
-
-LRESULT CALLBACK WndProc (HWND hwnd, UINT msg,
-    WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, 
+                                LPARAM lparam)
 {
-    switch(msg)
+    switch (msg)
     {
-        case WM_CLOSE:
-            DestroyWindow(hwnd);
-            break;
-        case WM_DESTROY:
-            PostQuitMessage(0);
-            break;
-        default:
-            return DefWindowProc(hwnd, msg, wParam, lParam);
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    
+    default:
+        return DefWindowProc (hwnd, msg, wparam, lparam);
+        break;
     }
+
     return 0;
 }
 
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
-    LPSTR lpCmdLine, int nCmdShow)
+int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance,
+                    LPSTR cmd, int showCmd)
 {
-    WNDCLASSEX wc;
+    // Init app
+    WNDCLASS wc = {0};
+    const char CLASS_NAME[] ="The Game";
+
+    wc.lpszClassName    = CLASS_NAME;
+    wc.lpfnWndProc      = WindowProcess;
+    wc.hInstance        = hInstance;
+    wc.hbrBackground    = (HBRUSH) (COLOR_WINDOW + 4);
+
+    RegisterClass(&wc);
+
+    // Create window
     HWND hwnd;
-    MSG Msg;
 
-    wc.cbSize        = sizeof (WNDCLASSEX);
-    wc.style         = 0;
-    wc.lpfnWndProc   = WndProc;
-    wc.cbClsExtra    = 0;
-    wc.cbWndExtra    = 0;
-    wc.hInstance     = hInstance;
-    wc.hIcon         = LoadIcon (NULL, IDI_APPLICATION);
-    wc.hCursor       = LoadCursor (NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH) (COLOR_WINDOW + 4);
-    wc.lpszMenuName  = NULL;
-    wc.lpszClassName = g_className;
-    wc.hIconSm       = LoadIcon (NULL, IDI_APPLICATION);
+    hwnd = CreateWindow (CLASS_NAME, CLASS_NAME,
+                        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                        0, 0, 500, 500, 0, 0, hInstance, 0);
 
-    if(!RegisterClassEx(&wc))
-    {
-        MessageBox(NULL, "Window Registration Failed!", "Error!",
-            MB_ICONEXCLAMATION | MB_OK);
+    if (hwnd == NULL)
         return 0;
-    }
 
-    hwnd = CreateWindowEx(
-            WS_EX_CLIENTEDGE,
-            g_className,
-            "The game",
-            WS_OVERLAPPEDWINDOW,
-            CW_USEDEFAULT, CW_USEDEFAULT,
-            WND_WIDTH, WND_HEIGHT,
-            NULL, NULL,
-            hInstance, NULL);
+    ShowWindow(hwnd, showCmd);
 
-    if(hwnd == NULL)
+    // Game loop
+    MSG msg = {0};
+    int running = 1;
+
+    while (running)
     {
-        MessageBox(NULL, "Window Creation Failed!", "Error!",
-            MB_ICONEXCLAMATION | MB_OK);
-        return 0;
+        while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+                running = 0;
+
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
     }
 
-    ShowWindow(hwnd, nCmdShow);
-    UpdateWindow(hwnd);
-
-    while(GetMessage(&Msg, NULL, 0, 0) > 0)
-    {
-        TranslateMessage(&Msg);
-        DispatchMessage(&Msg);
-    }
-
-    return Msg.wParam;
+    return 0;
 }
