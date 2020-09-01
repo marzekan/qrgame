@@ -1,19 +1,13 @@
 #include <windows.h>
 #include "utils.h"
 
-RECT moveLeft(RECT *rect){
-    rect->left -= 100;
-    rect->right -= 100;
-
-    return *rect;
-}
-
 LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, 
                                 LPARAM lparam)
 {
     HDC hdc;
     PAINTSTRUCT ps;
     RECT rect = {215,400,275,450};
+    HBRUSH hbrush = (HBRUSH) COLOR_WINDOW;
     
     switch (msg)
     {
@@ -23,19 +17,22 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam,
 
     case WM_PAINT:
         hdc = BeginPaint(hwnd, &ps);
-        HBRUSH hbrush;
-
-        hbrush = (HBRUSH) COLOR_WINDOW;
+        
         FillRect(hdc, &rect, hbrush);
-    
+        
+        EndPaint(hwnd, &ps);
+        
+        break;
+
     case WM_KEYDOWN:
+        hdc = GetDC(hwnd);
         if (wparam == VK_LEFT)
         {
-            rect.left -= 100;
-            rect.right -= 100;
-
+            rect.left -= 10;
+            rect.right -= 10;
             FillRect(hdc, &rect, hbrush);
         }
+        ReleaseDC(hwnd,hdc);
         break;
         
     
