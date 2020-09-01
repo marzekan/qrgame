@@ -1,4 +1,4 @@
-#include "windows.h"
+#include <windows.h>
 #include "utils.h"
 
 RECT moveLeft(RECT *rect){
@@ -25,7 +25,7 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam,
         hdc = BeginPaint(hwnd, &ps);
         HBRUSH hbrush;
 
-        hbrush = CreateSolidBrush(RGB(255,255,255));
+        hbrush = (HBRUSH) COLOR_WINDOW;
         FillRect(hdc, &rect, hbrush);
     
     case WM_KEYDOWN:
