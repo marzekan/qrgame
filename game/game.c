@@ -1,37 +1,60 @@
 #include <windows.h>
 #include "utils.h"
 
+RECT rect;
+int bonus = 0;
+int speed = 15;
+
 LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, 
                                 LPARAM lparam)
 {
     HDC hdc;
     PAINTSTRUCT ps;
-    RECT rect = {215,400,275,450};
     HBRUSH hbrush = (HBRUSH) COLOR_WINDOW;
+    HBRUSH bckgnd = (HBRUSH) (COLOR_WINDOW+4);
     
+
     switch (msg)
     {
+    case WM_CREATE:
+        SetRect(&rect, 215, 400, 275, 450);
+        break;
+
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
 
     case WM_PAINT:
         hdc = BeginPaint(hwnd, &ps);
-        
         FillRect(hdc, &rect, hbrush);
-        
         EndPaint(hwnd, &ps);
-        
         break;
+
 
     case WM_KEYDOWN:
         hdc = GetDC(hwnd);
-        if (wparam == VK_LEFT)
+        FillRect(hdc, &rect, bckgnd);
+
+        if (bonus==30)
         {
-            rect.left -= 10;
-            rect.right -= 10;
-            FillRect(hdc, &rect, hbrush);
+            bonus = 0;
         }
+        
+
+        switch(wparam)
+        {
+            case VK_LEFT:
+                OffsetRect(&rect, -(speed+bonus), 0);
+                bonus += 10;
+                break;
+            
+            case VK_RIGHT:
+                OffsetRect(&rect, +(speed+bonus), 0);
+                bonus += 10;
+                break;
+        }
+
+        FillRect(hdc, &rect, hbrush);
         ReleaseDC(hwnd,hdc);
         break;
         
