@@ -2,8 +2,10 @@
 #include "utils.h"
 
 RECT rect;
-int bonus = 0;
-int speed = 15;
+short bonus = 0;
+short speed = 20;
+char overflow = 0;
+short offset = 0;
 
 LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, 
                                 LPARAM lparam)
@@ -17,7 +19,7 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam,
     switch (msg)
     {
     case WM_CREATE:
-        SetRect(&rect, 215, 400, 275, 450);
+        SetRect(&rect, 230, 445, 265, 485);
         break;
 
     case WM_DESTROY:
@@ -35,24 +37,22 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam,
         hdc = GetDC(hwnd);
         FillRect(hdc, &rect, bckgnd);
 
-        if (bonus==30)
-        {
-            bonus = 0;
-        }
-        
+        bonus == 50 ? bonus = 0 : bonus;
 
         switch(wparam)
         {
             case VK_LEFT:
-                OffsetRect(&rect, -(speed+bonus), 0);
-                bonus += 10;
+                offset = (rect.left - (speed+bonus)) <= 0 ? rect.left : speed+bonus;
+                OffsetRect(&rect, -offset, 0);
                 break;
             
             case VK_RIGHT:
-                OffsetRect(&rect, +(speed+bonus), 0);
-                bonus += 10;
+                offset = (rect.right + (speed+bonus)) >= 500 ? (500 - rect.right) : speed+bonus;
+                OffsetRect(&rect, +offset, 0);
                 break;
         }
+
+        bonus += 10;
 
         FillRect(hdc, &rect, hbrush);
         ReleaseDC(hwnd,hdc);
@@ -85,8 +85,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance,
     HWND hwnd;
 
     hwnd = CreateWindow (CLASS_NAME, CLASS_NAME,
-                        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                        0, 0, 500, 500, 0, 0, hInstance, 0);
+                        WS_OVERLAPPED | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+                        0, 0, 510, 535, 0, 0, hInstance, 0);
 
     if (hwnd == NULL)
         return 0;
@@ -95,7 +95,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance,
 
     // Game loop
     MSG msg = {0};
-    int running = 1;
+    short running = 1;
 
     while (running)
     {
