@@ -7,6 +7,17 @@ short speed = 20;
 char overflow = 0;
 short offset = 0;
 
+RECT obsticles[5];
+
+void make_obsticles()
+{
+    for (short i = 0; i < 5; i++)
+    {
+        SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
+    }
+    
+}
+
 LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, 
                                 LPARAM lparam)
 {
@@ -20,6 +31,7 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam,
     {
     case WM_CREATE:
         SetRect(&rect, 230, 445, 265, 485);
+        make_obsticles();
         break;
 
     case WM_DESTROY:
@@ -29,9 +41,12 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam,
     case WM_PAINT:
         hdc = BeginPaint(hwnd, &ps);
         FillRect(hdc, &rect, hbrush);
+        for (short i = 0; i < 5; i++)
+        {
+            FillRect(hdc, &obsticles[i], hbrush);
+        }
         EndPaint(hwnd, &ps);
         break;
-
 
     case WM_KEYDOWN:
         hdc = GetDC(hwnd);
