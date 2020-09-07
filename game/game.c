@@ -18,6 +18,7 @@ RECT obsticles[5];
 DWORD tID;
 HANDLE  mvObsHandle;
 
+// kt - kill thread. Functions that closes thread handle.
 void kt(HANDLE *h)
 {
     if(h != NULL)
@@ -49,6 +50,7 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
         {
             for (short i = 0; i < 5; i++)
             {
+                
                 InvalidateRect(hw, &obsticles[i], TRUE);
                 SetRect(&obsticles[i], obsticles[i].left, obsticles[i].top+50, obsticles[i].right, obsticles[i].bottom+50);
             }
