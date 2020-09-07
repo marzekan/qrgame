@@ -16,17 +16,8 @@ short offset = 0;
 
 RECT obsticles[5];
 
-DWORD tID;
-HANDLE  mvObsHandle;
+volatile char create_new_obsticles = 1;
 
-void kt(HANDLE *h)
-{
-    if(h != NULL)
-    {
-        WaitForSingleObject(h, INFINITE);
-        CloseHandle(h);
-    }
-}
 
 void make_obsticles()
 {
@@ -36,12 +27,13 @@ void make_obsticles()
     }
 }
 
+
 DWORD WINAPI move_obsticles(LPVOID lparam)
 {
     HWND hw = *(HWND*)lparam;
     
-    while(1)
-    {
+    while(create_new_obsticles)
+    {   
         if(obsticles[1].bottom >= HEIGHT)
         {
             make_obsticles();
@@ -62,6 +54,7 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
     return 0;
 }
 
+
 LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
     HDC hdc;
@@ -77,7 +70,6 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
         break;
 
     case WM_DESTROY:
-        kt(&mvObsHandle);
         PostQuitMessage(0);
         break;
 
@@ -118,10 +110,6 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
         FillRect(hdc, &rect, hbrush);
         ReleaseDC(hwnd,hdc);
         break;
-
-    case WM_QUIT:
-        kt(&mvObsHandle);
-        break;
         
     
     default:
@@ -161,21 +149,26 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance, LPSTR cmd, int sho
     MSG msg = {0};
     short running = 1;
 
-    mvObsHandle = CreateThread(NULL, 0, move_obsticles, &hwnd, 0, &tID);
+    DWORD tID;
+    HANDLE mvObsHandle = CreateThread(NULL, 0, move_obsticles, &hwnd, 0, &tID);
 
     while (running)
     {
         while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
+            {
+                create_new_obsticles = 0;
+                DWORD status = WaitForSingleObject(mvObsHandle, INFINITE);
+                ExitThread(GetExitCodeThread(mvObsHandle, &status));
+
                 running = 0;
+            }
             
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
     }
-
-    kt(&mvObsHandle);
 
     return 0;
 }
