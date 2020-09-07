@@ -7,6 +7,7 @@
 #define WHITE COLOR_WINDOW
 #define BLACK (COLOR_WINDOW+4)
 
+
 RECT rect;
 short bonus = 0;
 short speed = 20;
