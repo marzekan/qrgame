@@ -1,25 +1,28 @@
 #include <windows.h>
+#include <stdlib.h>
+#include <time.h>
 #include "utils.h"
 
-#define HEIGHT 535
-#define WIDTH 510
-
-#define WHITE COLOR_WINDOW
-#define BLACK (COLOR_WINDOW+4)
+#define HEIGHT          535
+#define WIDTH           505
+#define OBSTICLES       5
+#define MAX_OBSTICLES   3
+#define MIN_OBSTICLES   1
+#define WHITE           COLOR_WINDOW
+#define BLACK           (COLOR_WINDOW + 4)
 
 RECT rect;
-short bonus = 0;
-short speed = 20;
+short bonus   = 0;
+short speed   = 20;
 char overflow = 0;
-short offset = 0;
+short offset  = 0;
 
-RECT obsticles[5];
-
+RECT obsticles[OBSTICLES];
 DWORD tID;
-HANDLE  mvObsHandle;
+HANDLE mvObsHandle;
 
 // kt - kill thread. Functions that closes thread handle.
-void kt(HANDLE *h)
+void kt (HANDLE *h)
 {
     if(h != NULL)
     {
@@ -29,14 +32,41 @@ void kt(HANDLE *h)
 }
 
 void make_obsticles()
-{
-    for (short i = 0; i < 5; i++)
+{ 
+    /*  
+        Right branch
+        Generates random number between [MAX_OBSTICLES, MIN_OBSTICLES] 
+        e.g. right = 3
+        ___________________
+        |     |     |     | 
+        |_____|_____|_____|
+    */
+    short right = (short) (rand() % MAX_OBSTICLES + MIN_OBSTICLES);
+
+    for (short i = 0; i < right; i++)
     {
         SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
     }
+
+    /* 
+        Left branch
+        This part of code should generate remaining part of obsticles
+        leaving 1 gap, size of 1 obsticle for sqare to move through, but 
+        it does not work :(
+        e.g. if right = 3 then left = 1
+        ___________________      ______
+        |     |     |     |      |     |
+        |_____|_____|_____|      |_____|
+    */
+    short left = OBSTICLES - MIN_OBSTICLES - right; 
+
+    for (short i = 1; i <= left; i++)
+    {
+        SetRect(&obsticles[OBSTICLES - i], 102*i, 0, 102+(102*i), 100);
+    }
 }
 
-DWORD WINAPI move_obsticles(LPVOID lparam)
+DWORD WINAPI move_obsticles (LPVOID lparam)
 {
     HWND hw = *(HWND*)lparam;
     
@@ -48,11 +78,11 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
         }
         else
         {
-            for (short i = 0; i < 5; i++)
+            for (short i = 0; i < OBSTICLES; i++)
             {
                 
                 InvalidateRect(hw, &obsticles[i], TRUE);
-                SetRect(&obsticles[i], obsticles[i].left, obsticles[i].top+50, obsticles[i].right, obsticles[i].bottom+50);
+                SetRect(&obsticles[i], obsticles[i].left, obsticles[i].top + 50, obsticles[i].right, obsticles[i].bottom + 50);
             }
         }
 
@@ -136,6 +166,8 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance, LPSTR cmd, int showCmd)
 {
     // Init app
+    srand((unsigned int)time(NULL));
+
     WNDCLASS wc = {0};
     const char CLASS_NAME[] ="Evade!";
 
