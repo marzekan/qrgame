@@ -25,15 +25,16 @@ unsigned short counter;
 
 void make_obsticles()
 {
-    counter = 0;
+    // counter = 0;
 
     for (short i = 0; i < MAX_OBSTICLES; i++)
     {
-        if(counter < MAX && rand()%MAX_OBSTICLES == i){
+        // if(counter < MAX_OBSTICLES-1 && rand()%MAX_OBSTICLES == i){
             
-            SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
-            counter++;
-        }
+        //     SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
+        //     counter++;
+        // }
+        SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
     }
 }
 
@@ -41,31 +42,36 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
 {
     HWND hw = *(HWND*)lparam;
     HDC hdc = GetDC(hw);
-
-    make_obsticles();
+    
     
     while(create_new_obsticles)
     {   
+        hdc = GetDC(hw);
+
         if(obsticles[0].bottom >= HEIGHT || obsticles[1].bottom >= HEIGHT || obsticles[2].bottom >= HEIGHT || obsticles[3].bottom >= HEIGHT || obsticles[4].bottom >= HEIGHT)
         {
             for (short i = 0; i < MAX_OBSTICLES; i++)
             {
-                // FillRect(hdc, &obsticles[i], (HBRUSH)BLACK);
-                InvalidateRect(hw, &obsticles[i], TRUE);
+                FillRect(hdc, &obsticles[i], (HBRUSH)BLACK);
             }
 
             make_obsticles();
         }
         else
         {
+            
             for (short i = 0; i < MAX_OBSTICLES; i++)
             {
-                InvalidateRect(hw, &obsticles[i], TRUE);
-                SetRect(&obsticles[i], obsticles[i].left, obsticles[i].top+50, obsticles[i].right, obsticles[i].bottom+50);
+                FillRect(hdc, &obsticles[i], (HBRUSH)BLACK);
+                OffsetRect(&obsticles[i], 0, +50);
+                FillRect(hdc, &obsticles[i], (HBRUSH)WHITE);
             }
+            
         }
 
+        ReleaseDC(hw, hdc);
         UpdateWindow(hw);
+        
         Sleep(400);
     }
 
@@ -77,14 +83,12 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 {
     HDC hdc;
     PAINTSTRUCT ps;
-    HBRUSH hbrush = (HBRUSH) WHITE;
-    HBRUSH bckgnd = (HBRUSH) BLACK;
 
     switch (msg)
     {
     case WM_CREATE:
         SetRect(&rect, 230, 445, 265, 485);
-        // make_obsticles();
+        make_obsticles();
         break;
 
     case WM_DESTROY:
@@ -94,11 +98,11 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
     case WM_PAINT:
         hdc = BeginPaint(hwnd, &ps);
         
-        FillRect(hdc, &rect, hbrush);
+        FillRect(hdc, &rect, (HBRUSH)WHITE);
         
         for (short i = 0; i < 5; i++)
         {
-            FillRect(hdc, &obsticles[i], hbrush);
+            FillRect(hdc, &obsticles[i], (HBRUSH)WHITE);
         }
         
         EndPaint(hwnd, &ps);
@@ -106,7 +110,7 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 
     case WM_KEYDOWN:
         hdc = GetDC(hwnd);
-        FillRect(hdc, &rect, bckgnd);
+        FillRect(hdc, &rect, (HBRUSH)BLACK);
 
         bonus == 50 ? bonus = 0 : bonus;
 
@@ -125,7 +129,7 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 
         bonus += 10;
 
-        FillRect(hdc, &rect, hbrush);
+        FillRect(hdc, &rect, (HBRUSH)WHITE);
         ReleaseDC(hwnd,hdc);
         break;
         
