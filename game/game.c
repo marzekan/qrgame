@@ -1,7 +1,6 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <time.h>
-#include "utils.h"
 
 #define HEIGHT          535
 #define WIDTH           505
@@ -32,32 +31,14 @@ void kt (HANDLE *h)
 }
 
 void make_obsticles()
-{ 
-    /*  
-        Right branch
-        Generates random number between [MAX_OBSTICLES, MIN_OBSTICLES] 
-        e.g. right = 3
-        ___________________
-        |     |     |     | 
-        |_____|_____|_____|
-    */
+{
     short right = (short) (rand() % MAX_OBSTICLES + MIN_OBSTICLES);
 
     for (short i = 0; i < right; i++)
     {
         SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
     }
-
-    /* 
-        Left branch
-        This part of code should generate remaining part of obsticles
-        leaving 1 gap, size of 1 obsticle for sqare to move through, but 
-        it does not work :(
-        e.g. if right = 3 then left = 1
-        ___________________      ______
-        |     |     |     |      |     |
-        |_____|_____|_____|      |_____|
-    */
+    
     short left = OBSTICLES - MIN_OBSTICLES - right; 
 
     for (short i = 1; i <= left; i++)
