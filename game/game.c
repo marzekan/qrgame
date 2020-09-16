@@ -1,11 +1,14 @@
 #include <windows.h>
-#include "utils.h"
+#include <stdlib.h>
+#include <time.h>
 
 #define HEIGHT 535
 #define WIDTH 510
 
 #define WHITE COLOR_WINDOW
 #define BLACK (COLOR_WINDOW+4)
+
+#define MAX_OBSTICLES 5
 
 
 RECT rect;
@@ -14,33 +17,48 @@ short speed = 20;
 char overflow = 0;
 short offset = 0;
 
-RECT obsticles[5];
+RECT obsticles[MAX_OBSTICLES];
 
 volatile char create_new_obsticles = 1;
+unsigned short counter;
 
 
 void make_obsticles()
 {
-    for (short i = 0; i < 5; i++)
+    counter = 0;
+
+    for (short i = 0; i < MAX_OBSTICLES; i++)
     {
-        SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
+        if(counter < 4 && rand()%MAX_OBSTICLES == i){
+            
+            SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
+            counter++;
+        }
     }
 }
-
 
 DWORD WINAPI move_obsticles(LPVOID lparam)
 {
     HWND hw = *(HWND*)lparam;
+    HDC hdc = GetDC(hw);
+
+    make_obsticles();
     
     while(create_new_obsticles)
     {   
-        if(obsticles[1].bottom >= HEIGHT)
+        if(obsticles[0].bottom >= HEIGHT || obsticles[1].bottom >= HEIGHT || obsticles[2].bottom >= HEIGHT || obsticles[3].bottom >= HEIGHT || obsticles[4].bottom >= HEIGHT)
         {
+            for (short i = 0; i < MAX_OBSTICLES; i++)
+            {
+                // FillRect(hdc, &obsticles[i], (HBRUSH)BLACK);
+                InvalidateRect(hw, &obsticles[i], TRUE);
+            }
+
             make_obsticles();
         }
         else
         {
-            for (short i = 0; i < 5; i++)
+            for (short i = 0; i < MAX_OBSTICLES; i++)
             {
                 InvalidateRect(hw, &obsticles[i], TRUE);
                 SetRect(&obsticles[i], obsticles[i].left, obsticles[i].top+50, obsticles[i].right, obsticles[i].bottom+50);
@@ -48,7 +66,7 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
         }
 
         UpdateWindow(hw);
-        Sleep(500);
+        Sleep(400);
     }
 
     return 0;
@@ -66,7 +84,7 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
     {
     case WM_CREATE:
         SetRect(&rect, 230, 445, 265, 485);
-        make_obsticles();
+        // make_obsticles();
         break;
 
     case WM_DESTROY:
@@ -151,6 +169,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance, LPSTR cmd, int sho
 
     DWORD tID;
     HANDLE mvObsHandle = CreateThread(NULL, 0, move_obsticles, &hwnd, 0, &tID);
+
+    srand((unsigned)time(NULL));
 
     while (running)
     {

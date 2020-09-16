@@ -1,0 +1,10 @@
+
+
+
+# PRVO CRTANJE RJEŠAVAMO.
+
+
+- Sporo se brišu RECT obsticles[5] s dna ekrana.
+
+- Ne poštuje se condition da ih je MAX 4 obsticles od jednom.
+
