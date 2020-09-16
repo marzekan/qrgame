@@ -29,7 +29,7 @@ void make_obsticles()
 
     for (short i = 0; i < MAX_OBSTICLES; i++)
     {
-        if(counter < 4 && rand()%MAX_OBSTICLES == i){
+        if(counter < MAX && rand()%MAX_OBSTICLES == i){
             
             SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
             counter++;
