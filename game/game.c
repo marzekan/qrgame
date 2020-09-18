@@ -2,73 +2,89 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define HEIGHT          535
-#define WIDTH           505
-#define OBSTICLES       5
-#define MAX_OBSTICLES   3
-#define MIN_OBSTICLES   1
-#define WHITE           COLOR_WINDOW
-#define BLACK           (COLOR_WINDOW + 4)
+#define HEIGHT  535
+#define WIDTH   510
+
+#define MAX_OBSTICLES 4
+#define MIN_OBSTICLES 3
+
+#define WHITE (COLOR_WINDOW + 1)
+#define BLACK (COLOR_WINDOW + 4)
 
 RECT rect;
-short bonus   = 0;
-short speed   = 20;
-char overflow = 0;
-short offset  = 0;
+short bonus     = 0;
+short speed     = 20;
+char overflow   = 0;
+short offset    = 0;
 
-RECT obsticles[OBSTICLES];
-DWORD tID;
-HANDLE mvObsHandle;
+short obs_size;
+short rand_position;
 
-// kt - kill thread. Functions that closes thread handle.
-void kt (HANDLE *h)
-{
-    if(h != NULL)
-    {
-        WaitForSingleObject(h, INFINITE);
-        CloseHandle(h);
-    }
-}
+RECT *obsticles;
+
+volatile char create_new_obsticles = 1;
 
 void make_obsticles()
 {
-    short right = (short) (rand() % MAX_OBSTICLES + MIN_OBSTICLES);
+    if(obsticles) free(obsticles);
 
-    for (short i = 0; i < right; i++)
-    {
-        SetRect(&obsticles[i], 102*i, 0, 102+(102*i), 100);
-    }
-    
-    short left = OBSTICLES - MIN_OBSTICLES - right; 
+    obs_size = (rand() % MAX_OBSTICLES) + MIN_OBSTICLES;
+    obsticles = calloc(obs_size, sizeof(RECT));
 
-    for (short i = 1; i <= left; i++)
+    char used_positions[MAX_OBSTICLES] = {0, 0, 0, 0};
+
+    for (short i = 0; i < obs_size; i++)
     {
-        SetRect(&obsticles[OBSTICLES - i], 102*i, 0, 102+(102*i), 100);
+        rand_position = rand() % MAX_OBSTICLES;
+
+        while (used_positions[rand_position] == 1)
+        {
+            rand_position = rand() % MAX_OBSTICLES;
+        }
+
+        SetRect(&obsticles[i], 102*rand_position, 0, 102+(102*rand_position), 100);
     }
 }
 
-DWORD WINAPI move_obsticles (LPVOID lparam)
+DWORD WINAPI move_obsticles(LPVOID lparam)
 {
     HWND hw = *(HWND*)lparam;
+    HDC hdc = GetDC(hw);
+
+    srand(time(NULL));
     
-    while(1)
-    {
-        if(obsticles[1].bottom >= HEIGHT)
+    make_obsticles();
+
+    
+    while(create_new_obsticles)
+    {   
+        hdc = GetDC(hw);
+
+        if(obsticles[0].bottom >= HEIGHT)
         {
+            for (short i = 0; i < obs_size; i++)
+            {
+                FillRect(hdc, &obsticles[i], (HBRUSH) BLACK);
+            }
+
             make_obsticles();
         }
         else
         {
-            for (short i = 0; i < OBSTICLES; i++)
+            
+            for (short i = 0; i < obs_size; i++)
             {
-                
-                InvalidateRect(hw, &obsticles[i], TRUE);
-                SetRect(&obsticles[i], obsticles[i].left, obsticles[i].top + 50, obsticles[i].right, obsticles[i].bottom + 50);
+                FillRect(hdc, &obsticles[i], (HBRUSH) BLACK);
+                OffsetRect(&obsticles[i], 0, +20);
+                FillRect(hdc, &obsticles[i], (HBRUSH) WHITE);
             }
+            
         }
 
+        ReleaseDC(hw, hdc);
         UpdateWindow(hw);
-        Sleep(500);
+
+        Sleep(120);
     }
 
     return 0;
@@ -78,29 +94,25 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 {
     HDC hdc;
     PAINTSTRUCT ps;
-    HBRUSH hbrush = (HBRUSH) WHITE;
-    HBRUSH bckgnd = (HBRUSH) BLACK;
 
     switch (msg)
     {
     case WM_CREATE:
         SetRect(&rect, 230, 445, 265, 485);
-        make_obsticles();
         break;
 
     case WM_DESTROY:
-        kt(&mvObsHandle);
         PostQuitMessage(0);
         break;
 
     case WM_PAINT:
         hdc = BeginPaint(hwnd, &ps);
         
-        FillRect(hdc, &rect, hbrush);
+        FillRect(hdc, &rect, (HBRUSH) WHITE);
         
         for (short i = 0; i < 5; i++)
         {
-            FillRect(hdc, &obsticles[i], hbrush);
+            FillRect(hdc, &obsticles[i], (HBRUSH) WHITE);
         }
         
         EndPaint(hwnd, &ps);
@@ -108,7 +120,7 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 
     case WM_KEYDOWN:
         hdc = GetDC(hwnd);
-        FillRect(hdc, &rect, bckgnd);
+        FillRect(hdc, &rect, (HBRUSH) BLACK);
 
         bonus == 50 ? bonus = 0 : bonus;
 
@@ -127,12 +139,9 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 
         bonus += 10;
 
-        FillRect(hdc, &rect, hbrush);
+        FillRect(hdc, &rect, (HBRUSH) WHITE);
         ReleaseDC(hwnd,hdc);
-        break;
 
-    case WM_QUIT:
-        kt(&mvObsHandle);
         break;
         
     
@@ -147,8 +156,6 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance, LPSTR cmd, int showCmd)
 {
     // Init app
-    srand((unsigned int)time(NULL));
-
     WNDCLASS wc = {0};
     const char CLASS_NAME[] ="Evade!";
 
@@ -175,21 +182,26 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance, LPSTR cmd, int sho
     MSG msg = {0};
     short running = 1;
 
-    mvObsHandle = CreateThread(NULL, 0, move_obsticles, &hwnd, 0, &tID);
+    DWORD tID;
+    HANDLE mvObsHandle = CreateThread(NULL, 0, move_obsticles, &hwnd, 0, &tID);
 
     while (running)
     {
         while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
+            {
+                create_new_obsticles = 0;
+                DWORD status = WaitForSingleObject(mvObsHandle, INFINITE);
+                ExitThread(GetExitCodeThread(mvObsHandle, &status));
+
                 running = 0;
+            }
             
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
     }
-
-    kt(&mvObsHandle);
 
     return 0;
 }
