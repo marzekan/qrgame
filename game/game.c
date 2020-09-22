@@ -12,6 +12,7 @@
 #define BLACK (COLOR_WINDOW + 4)
 
 RECT rect;
+RECT returned;
 short bonus     = 0;
 short speed     = 20;
 char overflow   = 0;
@@ -54,7 +55,6 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
     srand(time(NULL));
     
     make_obsticles();
-
     
     while(create_new_obsticles)
     {   
@@ -85,6 +85,10 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
         UpdateWindow(hw);
 
         Sleep(120);
+
+        if (IntersectRect(&returned, &rect, obsticles) !=0)
+            return 0;
+
     }
 
     return 0;
@@ -144,7 +148,6 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 
         break;
         
-    
     default:
         return DefWindowProc (hwnd, msg, wparam, lparam);
         break;
