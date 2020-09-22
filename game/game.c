@@ -11,8 +11,6 @@
 #define WHITE (COLOR_WINDOW + 1)
 #define BLACK (COLOR_WINDOW + 4)
 
-RECT rect;
-RECT returned;
 short bonus     = 0;
 short speed     = 20;
 char overflow   = 0;
@@ -21,6 +19,8 @@ short offset    = 0;
 short obs_size;
 short rand_position;
 
+RECT rect;
+RECT returned;
 RECT *obsticles;
 
 volatile char create_new_obsticles = 1;
@@ -42,6 +42,8 @@ void make_obsticles()
         {
             rand_position = rand() % MAX_OBSTICLES;
         }
+
+        // used_positions[rand_position] = 1;
 
         SetRect(&obsticles[i], 102*rand_position, 0, 102+(102*rand_position), 100);
     }
