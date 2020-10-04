@@ -20,20 +20,17 @@ short obs_size;
 short rand_position;
 
 RECT rect;
-RECT returned;
 RECT collision;
 RECT *obsticles;
 HANDLE mvObsHandle;
 
 volatile char create_new_obsticles = 1;
-volatile short j;
-volatile short k;
 
 void check_collision (HWND hw)
 {
-    for (j = 0; j < obs_size; j++)
+    for (short i = 0; i < obs_size; i++)
     {
-        IntersectRect(&collision, &rect, &obsticles[j]);
+        IntersectRect(&collision, &rect, &obsticles[i]);
 
         if (!IsRectEmpty(&collision))
             PostMessage(hw, WM_DESTROY, 0, 0);
@@ -48,11 +45,11 @@ void make_obsticles()
     obs_size = (rand() % MAX_OBSTICLES) + MIN_OBSTICLES;
     obsticles = calloc(obs_size, sizeof(RECT));
 
-    for (k = 0; k < obs_size; k++)
+    for (short i = 0; i < obs_size; i++)
     {
         rand_position = rand() % MAX_OBSTICLES;
 
-        SetRect(&obsticles[k], 102 * rand_position, 0, 102 + (102 * rand_position), 100);
+        SetRect(&obsticles[i], 102 * rand_position, 0, 102 + (102 * rand_position), 100);
     }
 }
 
@@ -71,9 +68,9 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
 
         if(obsticles[0].bottom >= HEIGHT)
         {
-            for (j = 0; j < obs_size; j++)
+            for (short i = 0; i < obs_size; i++)
             {
-                FillRect(hdc, &obsticles[j], (HBRUSH) BLACK);
+                FillRect(hdc, &obsticles[i], (HBRUSH) BLACK);
             }
 
             make_obsticles();
@@ -81,12 +78,12 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
         else
         {
             
-            for (k = 0; k < obs_size; k++)
+            for (short i = 0; i < obs_size; i++)
             {
-                FillRect(hdc, &obsticles[k], (HBRUSH) BLACK);
-                OffsetRect(&obsticles[k], 0, +20);
+                FillRect(hdc, &obsticles[i], (HBRUSH) BLACK);
+                OffsetRect(&obsticles[i], 0, +20);
                 check_collision(hw);
-                FillRect(hdc, &obsticles[k], (HBRUSH) WHITE);
+                FillRect(hdc, &obsticles[i], (HBRUSH) WHITE);
             }
             
         }
