@@ -21,31 +21,38 @@ short rand_position;
 
 RECT rect;
 RECT returned;
+RECT collision;
 RECT *obsticles;
+HANDLE mvObsHandle;
 
 volatile char create_new_obsticles = 1;
+volatile short j;
+volatile short k;
+
+void check_collision (HWND hw)
+{
+    for (j = 0; j < obs_size; j++)
+    {
+        IntersectRect(&collision, &rect, &obsticles[j]);
+
+        if (!IsRectEmpty(&collision))
+            PostMessage(hw, WM_DESTROY, 0, 0);
+    }
+}
 
 void make_obsticles()
 {
-    if(obsticles) free(obsticles);
+    if(obsticles)
+        free(obsticles);
 
     obs_size = (rand() % MAX_OBSTICLES) + MIN_OBSTICLES;
     obsticles = calloc(obs_size, sizeof(RECT));
 
-    char used_positions[MAX_OBSTICLES] = {0, 0, 0, 0};
-
-    for (short i = 0; i < obs_size; i++)
+    for (k = 0; k < obs_size; k++)
     {
         rand_position = rand() % MAX_OBSTICLES;
 
-        while (used_positions[rand_position] == 1)
-        {
-            rand_position = rand() % MAX_OBSTICLES;
-        }
-
-        // used_positions[rand_position] = 1;
-
-        SetRect(&obsticles[i], 102*rand_position, 0, 102+(102*rand_position), 100);
+        SetRect(&obsticles[k], 102 * rand_position, 0, 102 + (102 * rand_position), 100);
     }
 }
 
@@ -64,9 +71,9 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
 
         if(obsticles[0].bottom >= HEIGHT)
         {
-            for (short i = 0; i < obs_size; i++)
+            for (j = 0; j < obs_size; j++)
             {
-                FillRect(hdc, &obsticles[i], (HBRUSH) BLACK);
+                FillRect(hdc, &obsticles[j], (HBRUSH) BLACK);
             }
 
             make_obsticles();
@@ -74,11 +81,12 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
         else
         {
             
-            for (short i = 0; i < obs_size; i++)
+            for (k = 0; k < obs_size; k++)
             {
-                FillRect(hdc, &obsticles[i], (HBRUSH) BLACK);
-                OffsetRect(&obsticles[i], 0, +20);
-                FillRect(hdc, &obsticles[i], (HBRUSH) WHITE);
+                FillRect(hdc, &obsticles[k], (HBRUSH) BLACK);
+                OffsetRect(&obsticles[k], 0, +20);
+                check_collision(hw);
+                FillRect(hdc, &obsticles[k], (HBRUSH) WHITE);
             }
             
         }
@@ -188,7 +196,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE pInstance, LPSTR cmd, int sho
     short running = 1;
 
     DWORD tID;
-    HANDLE mvObsHandle = CreateThread(NULL, 0, move_obsticles, &hwnd, 0, &tID);
+    mvObsHandle = CreateThread(NULL, 0, move_obsticles, &hwnd, 0, &tID);
 
     while (running)
     {
