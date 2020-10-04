@@ -95,10 +95,6 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
         UpdateWindow(hw);
 
         Sleep(120);
-
-        if (IntersectRect(&returned, &rect, obsticles) !=0)
-            return 0;
-
     }
 
     return 0;
@@ -116,7 +112,14 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
         break;
 
     case WM_DESTROY:
-        PostQuitMessage(0);
+        SuspendThread(mvObsHandle);
+
+        if (MessageBox(hwnd, "Game over", "Evade!", MB_OKCANCEL) == IDOK)
+        {
+            PostQuitMessage(0);
+            DestroyWindow(hwnd);
+            exit(0);
+        }
         break;
 
     case WM_PAINT:

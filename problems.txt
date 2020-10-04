@@ -1,2 +1,1 @@
-Commented part at line 46 doesn't work. Don't know why. Whole program just freezes and needs to be shut down via task 
-menager. If you remove commented part while loop doesn't make sense.
+The last problem we need to fix is obsticle generator (for loop). And of course improve game smoothness.
