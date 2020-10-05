@@ -13,13 +13,14 @@
 
 short bonus = 0;
 short speed = 20;
-char overflow = 0;
 short offset = 0;
 
 short obs_size;
 short rand_position;
 
-RECT rect;
+char overflow = 0;
+
+RECT player;
 RECT collision;
 RECT *obsticles;
 HANDLE mvObsHandle;
@@ -30,7 +31,7 @@ void check_collision(HWND hw)
 {
     for (short i = 0; i < obs_size; i++)
     {
-        IntersectRect(&collision, &rect, &obsticles[i]);
+        IntersectRect(&collision, &player, &obsticles[i]);
 
         if (!IsRectEmpty(&collision))
         {
@@ -107,7 +108,7 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
     switch (msg)
     {
     case WM_CREATE:
-        SetRect(&rect, 230, 445, 265, 485);
+        SetRect(&player, 230, 445, 265, 485);
         break;
 
     case WM_DESTROY:
@@ -124,7 +125,7 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
     case WM_PAINT:
         hdc = BeginPaint(hwnd, &ps);
 
-        FillRect(hdc, &rect, (HBRUSH)WHITE);
+        FillRect(hdc, &player, (HBRUSH)WHITE);
 
         for (short i = 0; i < obs_size; i++)
         {
@@ -136,26 +137,26 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 
     case WM_KEYDOWN:
         hdc = GetDC(hwnd);
-        FillRect(hdc, &rect, (HBRUSH)BLACK);
+        FillRect(hdc, &player, (HBRUSH)BLACK);
 
         bonus == 50 ? bonus = 0 : bonus;
 
         switch (wparam)
         {
         case VK_LEFT:
-            offset = (rect.left - (speed + bonus)) <= 0 ? rect.left : speed + bonus;
-            OffsetRect(&rect, -offset, 0);
+            offset = (player.left - (speed + bonus)) <= 0 ? player.left : speed + bonus;
+            OffsetRect(&player, -offset, 0);
             break;
 
         case VK_RIGHT:
-            offset = (rect.right + (speed + bonus)) >= 500 ? (500 - rect.right) : speed + bonus;
-            OffsetRect(&rect, +offset, 0);
+            offset = (player.right + (speed + bonus)) >= 500 ? (500 - player.right) : speed + bonus;
+            OffsetRect(&player, +offset, 0);
             break;
         }
 
         bonus += 10;
 
-        FillRect(hdc, &rect, (HBRUSH)WHITE);
+        FillRect(hdc, &player, (HBRUSH)WHITE);
         ReleaseDC(hwnd, hdc);
 
         break;
