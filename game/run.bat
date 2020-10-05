@@ -1,2 +1,0 @@
-cl /c game.c && crinkler.exe game.obj "C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x86\user32.lib" "C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x86\kernel32.lib" "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC\14.27.29110\lib\x86\LIBCMT.lib" /entry:WinMain
-out
