@@ -11,18 +11,13 @@
 #define WHITE (COLOR_WINDOW + 1)
 #define BLACK (COLOR_WINDOW + 4)
 
-short bonus = 0;
-short speed = 20;
-short offset = 0;
-
 short obs_size;
 short rand_position;
-
-char overflow = 0;
 
 RECT player;
 RECT collision;
 RECT *obsticles;
+
 HANDLE mvObsHandle;
 
 volatile char create_new_obsticles = 1;
@@ -43,9 +38,7 @@ void check_collision(HWND hw)
 void make_obsticles()
 {
     if (obsticles)
-    {
         free(obsticles);
-    }
 
     obs_size = (rand() % MAX_OBSTICLES) + MIN_OBSTICLES;
     obsticles = calloc(obs_size, sizeof(RECT));
@@ -104,6 +97,10 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 {
     HDC hdc;
     PAINTSTRUCT ps;
+
+    short bonus = 0;
+    short speed = 20;
+    short offset = 0;
 
     switch (msg)
     {
@@ -196,9 +193,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE pInstance, LPSTR cmd, int show
                         WIDTH, HEIGHT, 0, 0, hInstance, 0);
 
     if (hwnd == NULL)
-    {
         return 0;
-    }
 
     ShowWindow(hwnd, showCmd);
 
