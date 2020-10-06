@@ -18,8 +18,6 @@ RECT *obsticles;
 
 HANDLE mvObsHandle;
 
-volatile char create_new_obsticles = 1;
-
 void check_collision(HWND hw, RECT *collision)
 {
     for (short i = 0; i < obs_size; i++)
@@ -59,7 +57,7 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
 
     make_obsticles(&rand_position);
 
-    while (create_new_obsticles)
+    while (1)
     {
         hdc = GetDC(hw);
 
@@ -210,7 +208,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE pInstance, LPSTR cmd, int show
         {
             if (msg.message == WM_QUIT)
             {
-                create_new_obsticles = 0;
                 DWORD status = WaitForSingleObject(mvObsHandle, INFINITE);
                 ExitThread(GetExitCodeThread(mvObsHandle, &status));
 
