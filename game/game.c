@@ -185,12 +185,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE pInstance, LPSTR cmd, int show
     // Create window
     HWND hwnd;
 
+    RECT desktop;
+    HWND desktopHandle = GetDesktopWindow();
+    GetWindowRect(desktopHandle, &desktop);
+
     hwnd = CreateWindow(CLASS_NAME, CLASS_NAME,
                         WS_OVERLAPPED | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-                        0, 0, WIDTH, HEIGHT, 0, 0, hInstance, 0);
+                        (desktop.right / 2) - HEIGHT / 2,
+                        (desktop.bottom / 2) - WIDTH / 2,
+                        WIDTH, HEIGHT, 0, 0, hInstance, 0);
 
     if (hwnd == NULL)
+    {
         return 0;
+    }
 
     ShowWindow(hwnd, showCmd);
 
