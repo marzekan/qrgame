@@ -11,12 +11,14 @@
 #define WHITE (COLOR_WINDOW + 1)
 #define BLACK (COLOR_WINDOW + 4)
 
-short obs_size;
+#define SLEEP_TIME 120
 
-RECT player;
-RECT *obsticles;
+volatile short obs_size;
 
-HANDLE mvObsHandle;
+volatile RECT player;
+volatile RECT *obsticles;
+
+volatile HANDLE mvObsHandle;
 
 void check_collision(HWND hw, RECT *collision)
 {
@@ -85,7 +87,7 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
         ReleaseDC(hw, hdc);
         UpdateWindow(hw);
 
-        Sleep(120);
+        Sleep(SLEEP_TIME);
     }
 
     return 0;
