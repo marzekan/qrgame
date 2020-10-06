@@ -13,18 +13,18 @@
 
 #define SLEEP_TIME 120
 
-volatile short obs_size;
+short obs_size;
 
-volatile RECT player;
-volatile RECT *obsticles;
+RECT player;
+RECT *obsticles;
 
-volatile HANDLE mvObsHandle;
+HANDLE mvObsHandle;
 
 void check_collision(HWND hw, RECT *collision)
 {
     for (short i = 0; i < obs_size; i++)
     {
-        IntersectRect(collision, &player, &obsticles[i]);
+        IntersectRect(collision, &player, (RECT *)&obsticles[i]);
 
         if (!IsRectEmpty(collision))
         {
