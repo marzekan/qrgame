@@ -5,6 +5,11 @@
 #define HEIGHT 535
 #define WIDTH 510
 
+#define PLAYER_START_POS_LEFT 230
+#define PLAYER_START_POS_TOP 445
+#define PLAYER_HEIGHT 40
+#define PLAYER_WIDTH 35
+
 #define MAX_OBSTICLES 4
 #define MIN_OBSTICLES 3
 
@@ -105,7 +110,11 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
     switch (msg)
     {
     case WM_CREATE:
-        SetRect(&player, 230, 445, 265, 485);
+        SetRect(&player,
+                PLAYER_START_POS_LEFT,
+                PLAYER_START_POS_TOP,
+                PLAYER_START_POS_LEFT + PLAYER_HEIGHT,
+                PLAYER_START_POS_TOP + PLAYER_WIDTH);
         break;
 
     case WM_DESTROY:
