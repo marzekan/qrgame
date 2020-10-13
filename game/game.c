@@ -54,6 +54,8 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
     HDC hdc = GetDC(hw);
     RECT collision;
     short rand_position;
+    short speedup = 0;
+    short speedup_counter = 0;
 
     srand(time(NULL));
 
@@ -71,6 +73,11 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
             }
 
             make_obsticles(&rand_position);
+
+            speedup_counter++;
+
+            if (speedup_counter % 50)
+                speedup += 2;
         }
         else
         {
@@ -87,7 +94,7 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
         ReleaseDC(hw, hdc);
         UpdateWindow(hw);
 
-        Sleep(SLEEP_TIME);
+        Sleep(SLEEP_TIME - speedup);
     }
 
     return 0;
