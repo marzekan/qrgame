@@ -19,6 +19,7 @@
 #define SLEEP_TIME 120
 
 short obs_size;
+short score;
 
 RECT player;
 RECT *obsticles;
@@ -79,6 +80,7 @@ DWORD WINAPI move_obsticles(LPVOID lparam)
 
             make_obsticles(&rand_position);
 
+            score++;
             speedup_counter++;
 
             if (speedup_counter % 50)
@@ -127,7 +129,11 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
     case WM_DESTROY:
         SuspendThread(mvObsHandle);
 
-        if (MessageBox(hwnd, "Game over", "Evade!", MB_OK) == IDOK)
+        char buff[30];
+
+        wsprintf(buff, "Game over\nScore: %i", score);
+
+        if (MessageBox(hwnd, buff, "Evade!", MB_OK) == IDOK)
         {
             PostQuitMessage(0);
             DestroyWindow(hwnd);
