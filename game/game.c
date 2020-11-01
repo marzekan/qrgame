@@ -19,7 +19,7 @@
 #define SLEEP_TIME 120
 
 short obs_size;
-short score;
+short score = 0;
 
 RECT player;
 RECT *obsticles;
@@ -134,6 +134,21 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
         wsprintf(buff, "Game over\nScore: %i", score);
 
         if (MessageBox(hwnd, buff, "Evade!", MB_OK) == IDOK)
+        {
+            PostQuitMessage(0);
+            DestroyWindow(hwnd);
+            exit(0);
+        }
+        break;
+
+    case WM_CLOSE:
+        SuspendThread(mvObsHandle);
+
+        char buff2[30];
+
+        wsprintf(buff2, "Game over\nScore: %i", score);
+
+        if (MessageBox(hwnd, buff2, "Evade!", MB_OK) == IDOK)
         {
             PostQuitMessage(0);
             DestroyWindow(hwnd);
