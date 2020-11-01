@@ -1,1 +1,0 @@
-The last problem we need to fix is obsticle generator (for loop). And of course improve game smoothness.
