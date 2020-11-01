@@ -20,6 +20,7 @@
 
 short obs_size;
 short score = 0;
+char score_buffer[30];
 
 RECT player;
 RECT *obsticles;
@@ -129,11 +130,9 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
     case WM_DESTROY:
         SuspendThread(mvObsHandle);
 
-        char buff[30];
+        wsprintf(score_buffer, "Game over\nScore: %i", score);
 
-        wsprintf(buff, "Game over\nScore: %i", score);
-
-        if (MessageBox(hwnd, buff, "Evade!", MB_OK) == IDOK)
+        if (MessageBox(hwnd, score_buffer, "Evade!", MB_OK) == IDOK)
         {
             PostQuitMessage(0);
             DestroyWindow(hwnd);
@@ -144,16 +143,22 @@ LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
     case WM_CLOSE:
         SuspendThread(mvObsHandle);
 
-        char buff2[30];
+        wsprintf(score_buffer, "Game over\nScore: %i", score);
 
-        wsprintf(buff2, "Game over\nScore: %i", score);
-
-        if (MessageBox(hwnd, buff2, "Evade!", MB_OK) == IDOK)
+        if (MessageBox(hwnd, "Are you sure you want to quit the game?", "Quit?", MB_YESNO) == IDYES)
         {
-            PostQuitMessage(0);
-            DestroyWindow(hwnd);
-            exit(0);
+            if (MessageBox(hwnd, score_buffer, "Evade!", MB_OK) == IDOK)
+            {
+                PostQuitMessage(0);
+                DestroyWindow(hwnd);
+                exit(0);
+            }
         }
+        else
+        {
+            ResumeThread(mvObsHandle);
+        }
+
         break;
 
     case WM_PAINT:
