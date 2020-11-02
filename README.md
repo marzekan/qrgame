@@ -4,7 +4,7 @@ The goal of the project was to make a simple game whose entire binary fits into 
 
 This project was greatly inspired by this MattKC video: https://www.youtube.com/watch?v=ExwqNreocpg&t=628s
 
-
+![](evade_gameplay.gif)
 
 ### Limitations
 
@@ -29,5 +29,8 @@ Seeing how we managed to get the binary size only to cca 6KB, we used the [Crink
  Stuff that would be cool to add to the game.
  
  [] Movement smoothness for the player and the obstacles.
+ 
  [] Power up system.
+ 
  [] Better code...
+ 
